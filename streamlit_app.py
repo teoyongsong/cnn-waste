@@ -7,6 +7,9 @@ Run (from directory containing this file):
 
 Needs: class_names.json (bundled), deployment_config.json, checkpoint .pth
 Dataset folder is optional if class_names.json is present.
+
+On Streamlit Cloud: add secret CHECKPOINT_URL pointing to a hosted .pth file,
+or commit best_waste_model.pth (see .gitignore exception).
 """
 from __future__ import annotations
 
@@ -22,6 +25,33 @@ st.set_page_config(
 )
 
 
+def _ensure_checkpoint_from_url() -> bool:
+    """If checkpoint is missing and CHECKPOINT_URL is in secrets, download it. Returns True if a new file was written."""
+    from urllib.error import URLError, HTTPError
+    from urllib.request import urlretrieve
+
+    from waste_model_loader import APP_DIR, load_deployment_config
+
+    cfg = load_deployment_config()
+    dest = APP_DIR / cfg["checkpoint"]
+    if dest.exists():
+        return False
+    try:
+        url = st.secrets.get("CHECKPOINT_URL", "") or ""
+    except Exception:
+        url = ""
+    url = url.strip()
+    if not url:
+        return False
+    try:
+        with st.spinner("Downloading model checkpoint (one-time, may take a minute)…"):
+            urlretrieve(url, str(dest))
+        return True
+    except (URLError, HTTPError, OSError, ValueError) as e:
+        st.error(f"Could not download checkpoint from CHECKPOINT_URL: {e}")
+        return False
+
+
 def _upload_signature(uploaded_file) -> str | None:
     if uploaded_file is None:
         return None
@@ -32,6 +62,9 @@ def _upload_signature(uploaded_file) -> str | None:
 def cached_predictor():
     return load_trained_model()
 
+
+if _ensure_checkpoint_from_url():
+    cached_predictor.clear()
 
 try:
     model, class_names, device, architecture, checkpoint_path, load_error = cached_predictor()
@@ -54,6 +87,21 @@ if load_error:
     st.info(
         f"Expected checkpoint: `{checkpoint_path}` · "
         f"`deployment_config.json` architecture: `{architecture}`"
+    )
+    st.markdown(
+        """
+**Fix on Streamlit Cloud (pick one):**
+
+1. **Secrets (recommended for large files)** — In the app → **Settings → Secrets**, add:
+   ```toml
+   CHECKPOINT_URL = "https://…/best_waste_model.pth"
+   ```
+   Use a **direct download** link (e.g. GitHub Release asset “raw” file, Hugging Face, cloud storage).
+
+2. **Commit the weights** — Allow and commit `best_waste_model.pth` (see `.gitignore`), then push. GitHub allows files under 100 MB.
+
+3. **Git LFS** — Track `*.pth` with Git LFS if the file is large.
+"""
     )
 else:
     st.success(

@@ -31,7 +31,14 @@ Optional: dataset under `data/` — not required for inference if `class_names.j
 2. New app → GitHub repo → **Main file**: path to `streamlit_app.py` (e.g. `cnn/streamlit_app.py` if repo root is above `cnn`).
 3. **Requirements file**: use `cnn/requirements-streamlit.txt` (faster install than full `requirements.txt`).
 4. **Python**: 3.10 or 3.11. If your repo root is not the `cnn/` folder, set the version in the Cloud UI or add a `runtime.txt` at the **repository root** (you can copy `cnn/runtime.txt` or mirror `python-3.10.12`).
-5. **Large `.pth` file**: Git LFS or host externally; if repo size limits apply, upload the checkpoint via release asset / Drive and document manual download, or use [Streamlit secrets](https://docs.streamlit.io/streamlit-community-cloud/deploy-your-app/secrets-management) to point to a URL (would require a small code change to download on startup).
+5. **Checkpoint on Cloud** (the app needs `best_waste_model.pth` at runtime):
+   - **Secrets:** In Cloud **Settings → Secrets**, add a direct-download URL:
+     ```toml
+     CHECKPOINT_URL = "https://github.com/USER/REPO/releases/download/v1/best_waste_model.pth"
+     ```
+     The app downloads the file once on startup. See `.streamlit/secrets.toml.example`.
+   - **Or commit the file:** `.gitignore` allows `best_waste_model.pth` at the repo root (`!best_waste_model.pth`). Add, commit, push (under GitHub’s 100 MB per-file limit).
+   - **Or Git LFS** for larger weights.
 
 ## Architecture strings
 

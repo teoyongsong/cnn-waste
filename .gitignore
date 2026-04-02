@@ -35,9 +35,12 @@ Thumbs.db
 # Streamlit
 .streamlit/secrets.toml
 
-# Large local artifacts (dataset + checkpoints — use Git LFS or release assets if you need them in git)
+# Large local artifacts (dataset — never commit raw images/zip)
 data/
+
+# Model weights: ignored by default (too large / LFS). To commit best_waste_model.pth for Streamlit Cloud, keep the two lines below.
 *.pth
+!best_waste_model.pth
 *.pt
 *.ckpt
 
