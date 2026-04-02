@@ -1,0 +1,13 @@
+torch
+torchvision
+torchaudio
+numpy
+pandas
+pillow
+matplotlib
+jupyter
+ipykernel
+fastapi
+uvicorn
+python-multipart
+streamlit

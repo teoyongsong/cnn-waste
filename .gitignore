@@ -1,0 +1,47 @@
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+*.Zone.Identifier
+
+# IDE (optional — remove if you commit workspace settings)
+.idea/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Large local artifacts (dataset + checkpoints — use Git LFS or release assets if you need them in git)
+data/
+*.pth
+*.pt
+*.ckpt
+
+# Logs / local runs
+*.log
+.pytest_cache/
+.coverage
+htmlcov/

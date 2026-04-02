@@ -1,0 +1,20 @@
+name: waste-cnn
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pandas
+  - pillow
+  - matplotlib
+  - jupyter
+  - ipykernel
+  - pip:
+      - torch
+      - torchvision
+      - torchaudio
+      - fastapi
+      - uvicorn
+      - python-multipart
+      - streamlit

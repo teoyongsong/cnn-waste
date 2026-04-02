@@ -1,0 +1,6 @@
+# https://docs.streamlit.io/library/advanced-features/configuration
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false

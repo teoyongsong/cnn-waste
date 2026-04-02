@@ -1,0 +1,4 @@
+{
+  "checkpoint": "best_waste_model.pth",
+  "architecture": "resnet18"
+}

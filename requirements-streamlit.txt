@@ -1,0 +1,6 @@
+# Minimal dependencies for Streamlit + inference (Streamlit Community Cloud or Docker).
+# In Cloud: set "Requirements file" to this path, e.g. cnn/requirements-streamlit.txt
+torch>=2.0.0
+torchvision>=0.15.0
+pillow>=9.0.0
+streamlit>=1.28.0
