@@ -27,6 +27,7 @@ env/
 .DS_Store
 Thumbs.db
 *.Zone.Identifier
+*:Zone.Identifier
 
 # IDE (optional — remove if you commit workspace settings)
 .idea/
