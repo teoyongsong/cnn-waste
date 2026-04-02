@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -98,6 +100,23 @@ def get_preprocess():
     )
 
 
+def resolve_checkpoint_path(cfg: dict) -> Path:
+    """
+    Find weights file: WASTE_CHECKPOINT_PATH env, repo root, then system temp
+    (Streamlit Cloud is often read-only under /mount/src — downloads go to /tmp).
+    """
+    name = cfg.get("checkpoint", "best_waste_model.pth")
+    env = (os.environ.get("WASTE_CHECKPOINT_PATH") or "").strip()
+    if env:
+        p = Path(env).expanduser().resolve()
+        if p.is_file():
+            return p
+    for candidate in (APP_DIR / name, Path(tempfile.gettempdir()) / name):
+        if candidate.is_file():
+            return candidate.resolve()
+    return (APP_DIR / name).resolve()
+
+
 def load_trained_model() -> Tuple[
     Optional[nn.Module],
     List[str],
@@ -112,10 +131,10 @@ def load_trained_model() -> Tuple[
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     class_names = load_class_names()
     cfg = load_deployment_config()
-    checkpoint_path = APP_DIR / cfg["checkpoint"]
+    checkpoint_path = resolve_checkpoint_path(cfg)
     architecture = cfg["architecture"]
 
-    if not checkpoint_path.exists():
+    if not checkpoint_path.is_file():
         return (
             None,
             class_names,

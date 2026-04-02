@@ -26,15 +26,16 @@ st.set_page_config(
 
 
 def _ensure_checkpoint_from_url() -> bool:
-    """If checkpoint is missing and CHECKPOINT_URL is in secrets, download it. Returns True if a new file was written."""
+    """If checkpoint is missing and CHECKPOINT_URL is in secrets, download to /tmp (Cloud app dir is often read-only)."""
+    from pathlib import Path
+    import tempfile
     from urllib.error import URLError, HTTPError
     from urllib.request import urlretrieve
 
-    from waste_model_loader import APP_DIR, load_deployment_config
+    from waste_model_loader import load_deployment_config, resolve_checkpoint_path
 
     cfg = load_deployment_config()
-    dest = APP_DIR / cfg["checkpoint"]
-    if dest.exists():
+    if resolve_checkpoint_path(cfg).is_file():
         return False
     try:
         url = st.secrets.get("CHECKPOINT_URL", "") or ""
@@ -43,6 +44,7 @@ def _ensure_checkpoint_from_url() -> bool:
     url = url.strip()
     if not url:
         return False
+    dest = Path(tempfile.gettempdir()) / cfg["checkpoint"]
     try:
         with st.spinner("Downloading model checkpoint (one-time, may take a minute)…"):
             urlretrieve(url, str(dest))
@@ -96,7 +98,7 @@ if load_error:
    ```toml
    CHECKPOINT_URL = "https://…/best_waste_model.pth"
    ```
-   Use a **direct download** link (e.g. GitHub Release asset “raw” file, Hugging Face, cloud storage).
+   Use a **direct download** link (e.g. GitHub Release asset, Hugging Face). The file is saved under **/tmp** (app folder is read-only on Cloud).
 
 2. **Commit the weights** — Allow and commit `best_waste_model.pth` (see `.gitignore`), then push. GitHub allows files under 100 MB.
 
